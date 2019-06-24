@@ -1,6 +1,8 @@
 require('dotenv').config()
 
-import { Client } from 'discord.js'
+import { Client, User } from 'discord.js'
+
+import './creature.ts'
 
 const client = new Client()
 
