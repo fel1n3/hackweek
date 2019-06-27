@@ -1,61 +1,31 @@
 import { Document, Model, Schema, model } from 'mongoose'
 import { felRandom } from './helper';
 
-interface Gene{
+export interface Gene{
 	name: string,
 	alleles: number[],
 	outcome: number
 }
-
+//types 
+// none , magic, physical, pure
 export function randomGenes(): {[key: string]: Gene}{
-	// Color
-	//4 colors 
-	// gray   -  		  any other combination not listed
-	// yellow - (```fix)  YY 1
-	// green  - (```css)  GG 2
-	// blue   - (```yaml) BB 3
-	let ca = felRandom(3) + 1
-	let cb = felRandom(3) + 1
 
-	let outcome = 0
-	if(ca==cb) outcome = ca
+	const dd = ['color','resist','attack']
+	let childgene:any = {}
+
+	for (let i = 0; i < 3; i++) {
+		let ca = felRandom(3) + 1
+		let cb = felRandom(3) + 1
 	
-	let cgene : Gene = { name: 'color', alleles: [ca,cb], outcome: outcome}
-
-	//Resist
-	//4 resists
-	// none     - any other combination not listed
-	// magic    - MM 0
-	// physical - PhyPhy 1
-	// pure     - PP 2
-	let ra = felRandom(3) + 1
-	let rb = felRandom(3) + 1
-
-	outcome = 0
-	if(ra==rb) outcome=ra
-	
-	let rgene : Gene = {name: 'resist', alleles: [ra,rb], outcome: outcome}
-
-	//Attack Type
-	//4 attack type
-	// none     - any other combination not listed
-	// magic    - MM 0
-	// physical - PhyPhy 1
-	// pure     - PP 2
-	let aa = felRandom(3) + 1
-	let ab = felRandom(3) + 1
-
-	outcome = 0
-	if(ra==rb) outcome=ra
-	
-	let agene : Gene = {name: 'resist', alleles: [aa,ab], outcome: outcome}
-
-	return {
-		color: cgene,
-		resist: rgene,
-		attack: agene
+		let outcome = 0
+		if(ca==cb) outcome = ca
+		
+		let gene : Gene = { name: dd[i], alleles: [ca,cb], outcome: outcome}
+		
+		childgene[dd[i]] = gene
+		
 	}
-
+	return childgene
 }
 
 declare interface ICreature extends Document{ 
