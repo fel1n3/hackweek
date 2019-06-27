@@ -4,14 +4,13 @@ import { Client, User } from 'discord.js'
 import * as _ from 'lodash'
 
 import { Creature } from './creature'
-import './database'
+import { /*checkifnew, addcreature,*/ DB } from './database'
 
 
 const client = new Client()
 
 client.on('ready', () => {
 	console.log('I\'m ready master OwO')
-	new Creature('charlie', 'Charlemange')
 })
 
 client.on('message', msg => {
@@ -23,12 +22,24 @@ client.on('message', msg => {
 
 			if(!_.head(args)) return msg.reply('Provide a name for your kid after \`\`!start\`\`')
 
-			let name = _.join(args, ' ')
+			DB.Models.Creature.find({owner: msg.author.id}, (err: Error, res) => {
+				if(err) throw err
+				console.log(res.length, res)
+				if(res.length > 0) return msg.reply('You\'ve already made your first creature!')
+				let name = _.join(args, ' ')
 
-			msg.channel.send(`Congratulations ${msg.author}, your first child is named \`\`${name}\`\``)
-			let a = new Creature(name, msg.author.username)
+				msg.channel.send(`Congratulations ${msg.author}, your first child is named \`\`${name}\`\``)
+				let a = new DB.Models.Creature({
+					name: name,
+					owner: msg.author.id
+				})
 
-			console.log(a.name, a.owner)
+				a.save(err => {
+					if(err) throw err
+				})
+	
+			})
+			
 	}
 })
 
