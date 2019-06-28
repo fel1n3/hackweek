@@ -17,6 +17,7 @@ client.on('ready', () => {
 const colors = ['```','```fix','```css','```yaml']
 
 let waiting: Object[] = []
+//{user,other,callback,...}
 
 client.on('message', msg => {
 	let arg = _.split(msg.content, ' ')
@@ -81,7 +82,17 @@ client.on('message', msg => {
 					if(resb.length == 0) return msg.reply('the person you tried to breed with does not have a creature.')
 
 					msg.channel.send(`${msg.mentions.users.first()} do you consent? Type \`\`!y\`\` or \`\`!n\`\``)
-					waiting.push({user: msg.mentions.users.first().id, partner: msg.author.id, resa: resa, resb:resb,msg:msg})				
+					waiting.push({
+						user: msg.mentions.users.first().id, 
+						partner: msg.author.id,
+						success: breed,
+						failure: function(a) {msg.channel.send(`${a.author} denied your breeding attempts ${msg.author}`) },
+						data: {
+							resa: resa,
+							resb: resb,
+							msg: msg
+						}
+					})				
 				})
 			})
 
@@ -92,14 +103,17 @@ client.on('message', msg => {
 			if(!data) return 
 
 			waiting.pop()
-			breed(data['msg'], data['resa'],data['resb'])
+			data['success'](data['data'])
+			//breed(data['msg'], data['resa'],data['resb'])
 			break
 		case '!n':
 			let a = _.find(waiting, {user:msg.author.id})
 			if(!a) return
 
-			let deny = waiting.pop()['msg']
-			msg.channel.send(`${msg.author} denied your breeding attempts ${deny.author}`)
+			waiting.pop()
+			a['failure'](msg)
+			//let deny = waiting.pop()['msg']
+			//msg.channel.send(`${msg.author} denied your breeding attempts ${deny.author}`)
 
 			break
 		case '!rename':
@@ -125,6 +139,9 @@ client.on('message', msg => {
 				msg.reply(`${before} has been renamed to ${after}`)
 			})
 			break
+		case '!battle':
+			if(msg.mentions.users.array().length < 1) return msg.reply('please tag someone to battle with.')
+
 		case '!sleep': //temp command
 			DB.Models.Creature.deleteOne({owner:msg.author.id}, (err: Error) => {
 				if(err) throw err;
@@ -137,8 +154,11 @@ client.on('message', msg => {
 })
 
 client.login(process.env.token)
-function breed(msg: Message, resa, resb) {
+function breed(data: Object) {
 	//msg.channel.send(`\`\`${resa[0].name}\`\` breeds with \`\` ${resb[0].name}\`\``);
+	let resa = data['resa']
+	let resb = data['resb']
+	let msg = data['msg']
 	const dd = ['color', 'resist', 'attack'];
 	let childgene: any = {};
 	for (let i = 0; i < 3; i++) {
@@ -157,7 +177,7 @@ function breed(msg: Message, resa, resb) {
 		childgene[dd[i]] = gene;
 	}
 	let cname = moniker.choose()
-	msg.channel.send(`Congratulations ${msg.author}, ${cname} is born. It\s color is ${childgene.color.outcome}, it's resist is ${childgene.resist.outcome}, and it's attack type is ${childgene.attack.outcome}`);
+	msg.channel.send(`Congratulations ${msg.author}, \`\`${cname}\`\` is born. It\s color is ${childgene.color.outcome}, it's resist is ${childgene.resist.outcome}, and it's attack type is ${childgene.attack.outcome}`);
 	
 	let gen = Math.max(resa[0].generation, resb[0].generation)+1
 	let a = new DB.Models.Creature({
