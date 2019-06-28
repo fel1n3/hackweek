@@ -1,5 +1,6 @@
 import { Document, Model, Schema, model } from 'mongoose'
 import { felRandom } from './helper';
+import { ObjectID } from 'bson';
 
 export interface Gene{
 	name: string,
@@ -31,11 +32,17 @@ export function randomGenes(): {[key: string]: Gene}{
 declare interface ICreature extends Document{ 
 	name: String,
 	owner: String
-	genes: {[key: string]: Gene}
+	genes: {[key: string]: Gene},
+	generation: number
+}
+
+declare interface IInventory extends Document{
+	_id: ObjectID
+	creatures: string[]
 }
 
 export interface CreatureModel extends Model<ICreature>{}
-
+export interface InventoryModel extends Model<IInventory>{}
 
 export class Creature {
 	private _model: Model<ICreature>
@@ -44,13 +51,32 @@ export class Creature {
 		const schema = new Schema({
 			name: { type: String, required: true },
 			owner: { type: String, required: true },
-			genes: { type: Object, required: true }
+			genes: { type: Object, required: true },
+			generation: {type: Number, default:'0'}
 		})
 
 		this._model = model<ICreature>('Creature', schema)
 	}	
 
 	public get model(): Model<ICreature> {
+		return this._model
+	}
+
+}
+
+export class Inventory {
+	private _model: Model<IInventory>
+
+	constructor(){
+		const schema = new Schema({
+			_id: {type: Number, required: true},
+			creatures: { type: Object, required:true}
+		}, { _id: false })
+
+		this._model = model<IInventory>('Inventory', schema)
+	}	
+
+	public get model(): Model<IInventory> {
 		return this._model
 	}
 

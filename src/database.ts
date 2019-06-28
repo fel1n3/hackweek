@@ -1,8 +1,9 @@
 import { connect, connection, Connection } from 'mongoose'
-import { Creature, CreatureModel } from './creature'
+import { Creature, CreatureModel, InventoryModel, Inventory } from './creature'
 
 declare interface IModels{
 	Creature: CreatureModel
+	Inventory: InventoryModel
 }
 
 export class DB {
@@ -12,13 +13,14 @@ export class DB {
 	private _models: IModels
 	
 	private constructor() {
-		connect(process.env.url, {useNewUrlParser: true})
+		connect(process.env.url, {useNewUrlParser: true, useFindAndModify: false })
 		this._db = connection
 		this._db.on('open', this.connected)
 		this._db.on('error', this.error)
 
 		this._models = {
-			Creature: new Creature().model
+			Creature: new Creature().model,
+			Inventory: new Inventory().model
 		}
 	}
 
