@@ -11,6 +11,7 @@
   "author": "fel1n3 <riley800@y7mail.com>",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
+    "@types/easy-table": "^0.0.32",
     "@types/lodash": "^4.14.134",
     "@types/mongodb": "^3.1.28",
     "@types/mongoose": "^5.5.6",
@@ -24,6 +25,7 @@
     "bson-ext": "^2.0.2",
     "bufferutil": "^4.0.1",
     "discord.js": "^11.5.1",
+    "easy-table": "^1.1.1",
     "lodash": "^4.17.11",
     "mongodb": "^3.2.7",
     "mongoose": "^5.6.1",
